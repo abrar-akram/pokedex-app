@@ -12,7 +12,7 @@ const Search = ({navigation}) => {
   const handleSearch = async () => {
     const name = query?.toLowerCase();
     try {
-      const res = await axios.get(`https://pokeapi.co/api/v1/pokemon/${query}`);
+      const res = await axios.get(`https://pokeapi.co/api/v1/pokemon/${name}`);
       navigation.navigate('Details', {details: res.data});
       console.log('res', res.data);
     } catch (err) {

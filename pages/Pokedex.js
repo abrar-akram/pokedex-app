@@ -1,33 +1,39 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, FlatList, Image} from 'react-native';
+import {Text, View, FlatList, Image, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 
-const renderItem = ({item}) => {
-  return (
-    <View>
-      <Image
-        style={{height: 60, width: 60}}
-        source={{uri: item?.sprites?.front_default}}></Image>
-      <Text style={{padding: 1}}>{item?.name}</Text>
-    </View>
-  );
-};
+const Pokedex = ({navigation}) => {
+  const renderItem = ({item}) => {
+    const handlePress = item => {
+      navigation.navigate('Details', {details: item});
+    };
+    return (
+      <TouchableOpacity onPress={() => handlePress(item)}>
+        <Image
+          style={{height: 60, width: 60}}
+          source={{uri: item?.sprites?.front_default}}></Image>
+        <Text style={{padding: 1}}>{item?.name}</Text>
+      </TouchableOpacity>
+    );
+  };
 
-const Pokedex = () => {
-  const [offset, setOffset] = useState(10);
+  const [loader, setLoader] = useState();
+  const [offset, setOffset] = useState(0);
   const [pokeList, setPokeList] = useState([]);
 
   const getPokeList = async () => {
+    let list = [];
     try {
-      let list = [];
-      for (let i = 1; i <= offset; i++) {
-        const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
-        // const data = await axios.get(`${res?.data?.results?.url}`);
-        // res?.data?.results?.map(() => setPokeList([...pokeList, [data]]));
-        // console.log('pokelist', res);
-        list = [...list, res?.data];
+      const res = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon?limit=10&offset=${offset}`,
+      );
+      for (let i = 0; i < 10; i++) {
+        const data = await axios.get(`${res?.data?.results[i]?.url}`);
+        list = [...list, data?.data];
       }
-      setPokeList(list);
+      console.log('list', list, list.length);
+      if (list.length === 10) setPokeList([...pokeList, ...list]);
+      list = [];
     } catch (err) {
       console.log('err', err);
     }
@@ -36,16 +42,23 @@ const Pokedex = () => {
   useEffect(() => {
     getPokeList();
   }, [offset]);
-
-  console.log(pokeList);
+  console.log('pokeList', pokeList);
 
   return (
-    <FlatList
-      onEndReachedThreshold={0.5}
-      onEndReached={() => setOffset(offset + 10)}
-      extraData={offset}
-      data={pokeList}
-      renderItem={renderItem}></FlatList>
+    <>
+      <FlatList
+        // style={{marginBottom: 60}}
+        onEndReachedThreshold={0.5}
+        onEndReached={() => {
+          if (pokeList.length >= 10) setOffset(offset + 10);
+          // getPokeList();
+        }}
+        extraData={offset}
+        data={pokeList}
+        maxToRenderPerBatch={10}
+        renderItem={renderItem}></FlatList>
+      {loader && <Text>loading...</Text>}
+    </>
   );
 };
 

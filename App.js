@@ -30,6 +30,8 @@ import {
 import Pokedex from './pages/Pokedex';
 import Search from './pages/Search';
 import PokemonDetails from './pages/PokemonDetails';
+import Filter from './pages/Filter';
+import BookmarkedList from './pages/BookmarkedList';
 
 // const Section = ({children, title}) => {
 //   const isDarkMode = useColorScheme() === 'dark';
@@ -71,6 +73,8 @@ const App = () => {
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="Pokedex" component={Pokedex} />
         <Stack.Screen name="Details" component={PokemonDetails} />
+        <Stack.Screen name="Filter" component={Filter} />
+        <Stack.Screen name="Bookmarks" component={BookmarkedList} />
       </Stack.Navigator>
     </NavigationContainer>
   );
